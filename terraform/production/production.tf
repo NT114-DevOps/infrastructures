@@ -1,7 +1,5 @@
 # Setup production environment cluster
 
-
-
 terraform {
   required_providers {
     aws = {
@@ -99,49 +97,4 @@ data "aws_eks_cluster" "production_cluster" {
 
 data "aws_eks_cluster_auth" "production_cluster" {
   name = "production_cluster"
-}
-
-# Configure the Kubernetes provider
-provider "kubernetes" {
-  host                   = aws_eks_cluster.production_cluster.endpoint
-  cluster_ca_certificate = base64decode(aws_eks_cluster.production_cluster.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.production_cluster.token
-}
-
-# Install ArgoCD on the EKS cluster
-resource "kubernetes_namespace" "argocd" {
-  metadata {
-    name = "argocd"
-  }
-}
-
-resource "helm_release" "argocd" {
-  name       = "argocd"
-  chart      = "argo/argo-cd"
-  namespace  = kubernetes_namespace.argocd.metadata[0].name
-  version    = "4.9.6"
-
-  values = [
-    file("argocd-values.yaml")
-  ]
-}
-
-# Expose the ArgoCD server using a LoadBalancer service
-resource "kubernetes_service" "argocd_server" {
-  metadata {
-    name      = "argocd-server"
-    namespace = kubernetes_namespace.argocd.metadata[0].name
-  }
-
-  spec {
-    type = "LoadBalancer"
-    port {
-      port        = 80
-      target_port = 8080
-    }
-
-    selector = {
-      "app.kubernetes.io/name" = "argocd-server"
-    }
-  }
 }
