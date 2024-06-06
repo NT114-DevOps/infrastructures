@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: my-app
+  name: argo-app
   namespace: argocd
 spec:
   project: default
@@ -16,6 +16,7 @@ spec:
   destination:
   # Change this to K8S endpoint
     server: https://kubernetes.default.svc
+    namespace: default
 
   syncPolicy:
     automated:

@@ -63,6 +63,7 @@ resource "aws_eks_node_group" "my_node_group" {
   depends_on = [ aws_eks_cluster.production_cluster ]
 }
 
+
 # EKS Add-ons
 resource "aws_eks_addon" "coredns" {
   cluster_name = local.cluster_name
@@ -90,4 +91,53 @@ resource "aws_eks_addon" "eks-pod-identity-agent" {
   addon_name = "eks-pod-identity-agent"
   addon_version = "v1.2.0-eksbuild.1"
   depends_on = [ aws_eks_cluster.production_cluster ]
+}
+
+data "aws_eks_cluster" "production_cluster" {
+  name = "production_cluster"
+}
+
+# Configure the Kubernetes provider
+provider "kubernetes" {
+  host                   = aws_eks_cluster.production_cluster.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.production_cluster.certificate_authority[0].data)
+  token                  = data.aws_eks_cluster_auth.this.token
+}
+
+# Install ArgoCD on the EKS cluster
+resource "kubernetes_namespace" "argocd" {
+  metadata {
+    name = "argocd"
+  }
+}
+
+resource "helm_release" "argocd" {
+  name       = "argocd"
+  chart      = "argo/argo-cd"
+  namespace  = kubernetes_namespace.argocd.metadata[0].name
+  version    = "4.9.6"
+
+  values = [
+    file("argocd-values.yaml")
+  ]
+}
+
+# Expose the ArgoCD server using a LoadBalancer service
+resource "kubernetes_service" "argocd_server" {
+  metadata {
+    name      = "argocd-server"
+    namespace = kubernetes_namespace.argocd.metadata[0].name
+  }
+
+  spec {
+    type = "LoadBalancer"
+    port {
+      port        = 80
+      target_port = 8080
+    }
+
+    selector = {
+      "app.kubernetes.io/name" = "argocd-server"
+    }
+  }
 }
