@@ -97,11 +97,15 @@ data "aws_eks_cluster" "production_cluster" {
   name = "production_cluster"
 }
 
+data "aws_eks_cluster_auth" "production_cluster" {
+  name = "production_cluster"
+}
+
 # Configure the Kubernetes provider
 provider "kubernetes" {
   host                   = aws_eks_cluster.production_cluster.endpoint
   cluster_ca_certificate = base64decode(aws_eks_cluster.production_cluster.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.this.token
+  token                  = data.aws_eks_cluster_auth.production_cluster.token
 }
 
 # Install ArgoCD on the EKS cluster
