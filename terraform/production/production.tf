@@ -90,11 +90,3 @@ resource "aws_eks_addon" "eks-pod-identity-agent" {
   addon_version = "v1.2.0-eksbuild.1"
   depends_on = [ aws_eks_cluster.production_cluster ]
 }
-
-data "aws_eks_cluster" "production_cluster" {
-  name = "production_cluster"
-}
-
-data "aws_eks_cluster_auth" "production_cluster" {
-  name = "production_cluster"
-}
