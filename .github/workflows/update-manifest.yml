@@ -1,0 +1,78 @@
+name: Manual manifest update
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to update manifest'
+        required: true
+        type: choice
+        options:
+          - test
+          - production
+
+      component:
+        description: 'Component to update manifest'
+        required: true
+        type: choice
+        options:
+          - mern-stack-frontend
+          - auth-microservice
+          - post-microservice
+          - comment-microservice
+          - gateway-service
+
+      tag:
+        description: 'Docker tag to update manifest'
+        required: true
+        type: string
+        
+
+jobs:
+  update-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout infrastructure repo
+        uses: actions/checkout@v3
+
+      - run: |
+          git config --global user.email "ntbquoc2015@gmail.com"
+          git config --global user.name "TonyQ2k3"
+          echo "Update ${{ github.event.inputs.component }} version to ${{ github.event.inputs.tag }}"
+      
+      - name: Update frontend manifest
+        if: ${{ github.event.inputs.component == 'mern-stack-frontend' }}
+        run: |
+          sed -i 's#tonyq2k3/mern-stack-frontend:[^[:space:]]*$#tonyq2k3/mern-stack-frontend:${{ github.event.inputs.tag }}#g' ./${{ github.event.inputs.environment }}/frontend/frontend-deploy.yaml
+          git add ./${{ github.event.inputs.environment }}/frontend/frontend-deploy.yaml
+
+      - name: Update auth microservice manifest
+        if: ${{ github.event.inputs.component == 'auth-microservice' }}
+        run: |
+           sed -i 's#tonyq2k3/auth-microservice:[^[:space:]]*$#tonyq2k3/auth-microservice:${{ github.event.inputs.tag }}#g' ./${{ github.event.inputs.environment }}/microservices/auth-service-deploy.yaml
+           git add ./${{ github.event.inputs.environment }}/microservices/auth-service-deploy.yaml
+
+      - name: Update post microservice manifest
+        if: ${{ github.event.inputs.component == 'post-microservice' }}
+        run: |
+            sed -i 's#tonyq2k3/auth-microservice:[^[:space:]]*$#tonyq2k3/auth-microservice:${{ github.event.inputs.tag }}#g' ./${{ github.event.inputs.environment }}/microservices/post-service-deploy.yaml
+            git add ./${{ github.event.inputs.environment }}/microservices/post-service-deploy.yaml
+            
+      - name: Update comment microservice manifest
+        if: ${{ github.event.inputs.component == 'comment-microservice' }}
+        run: |
+            sed -i 's#tonyq2k3/comment-microservice:[^[:space:]]*$#tonyq2k3/comment-microservice:${{ github.event.inputs.tag }}#g' ./${{ github.event.inputs.environment }}/microservices/comment-service-deploy.yaml
+            git add ./${{ github.event.inputs.environment }}/microservices/comment-service-deploy.yaml
+
+      - name: Update gateway manifest
+        if: ${{ github.event.inputs.component == 'gateway-service' }}
+        run: |
+            sed -i 's#tonyq2k3/gateway-service:[^[:space:]]*$#tonyq2k3/gateway-service:${{ github.event.inputs.tag }}#g' ./${{ github.event.inputs.environment }}/microservices/gateway-deploy.yaml
+            git add ./${{ github.event.inputs.environment }}/microservices/gateway-deploy.yaml 
+
+
+      - name: Commit update
+        run: |
+          git commit -m "Update ${{ github.event.inputs.component }} version to ${{ github.event.inputs.tag }} in ${{ github.event.inputs.environment }} environment"
+          git push origin main
+      
