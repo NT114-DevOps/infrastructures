@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argo-app
+  name: test-environment-argo
   namespace: argocd
 spec:
   project: default
@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://github.com/NT114-DevOps/infrastructures.git
     targetRevision: HEAD
-    path: deployment
+    path: test
     directory:
       recurse: true
 
