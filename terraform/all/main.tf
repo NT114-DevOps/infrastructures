@@ -51,9 +51,9 @@ resource "aws_eks_node_group" "test_node_group" {
   subnet_ids       = local.subnet_ids
 
   scaling_config {
-    desired_size = 3
+    desired_size = 4
     max_size     = 4
-    min_size     = 3
+    min_size     = 4
   }
 
   update_config {
@@ -122,9 +122,9 @@ resource "aws_eks_node_group" "prod_node_group" {
   subnet_ids       = local.subnet_ids
 
   scaling_config {
-    desired_size = 3
+    desired_size = 4
     max_size     = 4
-    min_size     = 3
+    min_size     = 4
   }
 
   update_config {
