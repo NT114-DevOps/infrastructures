@@ -35,14 +35,6 @@ resource "aws_eks_cluster" "test_cluster" {
   version = "1.29" 
 }
 
-output "endpoint" {
-  value = aws_eks_cluster.test_cluster.endpoint
-}
-
-output "kubeconfig-certificate-authority-data" {
-  value = aws_eks_cluster.test_cluster.certificate_authority[0].data
-}
-
 # EKS Node Group
 resource "aws_eks_node_group" "test_node_group" {
   cluster_name    = local.cluster_name
@@ -61,6 +53,14 @@ resource "aws_eks_node_group" "test_node_group" {
   }
 
   depends_on = [ aws_eks_cluster.test_cluster ]
+}
+
+output "endpoint1" {
+  value = aws_eks_cluster.test_cluster.endpoint
+}
+
+output "kubeconfig-certificate-authority-data1" {
+  value = aws_eks_cluster.test_cluster.certificate_authority[0].data
 }
 
 
