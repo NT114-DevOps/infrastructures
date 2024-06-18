@@ -14,3 +14,10 @@ jobs:
             -   
                 name: Show
                 run: echo ${SHORT_SHA}
+
+    Another-run:
+        runs-on: ubuntu-latest
+        steps:
+            -   
+                name: Show
+                run: echo ${SHORT_SHA}

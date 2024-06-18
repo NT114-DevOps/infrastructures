@@ -1,22 +1,16 @@
-# Setup testing environment cluster
+# Setup test environment cluster
 
-provider "helm" {
-    kubernetes {
-      host                   = aws_eks_cluster.test_cluster.endpoint
-      cluster_ca_certificate = base64decode(aws_eks_cluster.test_cluster.certificate_authority[0].data)
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
+  }
 }
 
-
-provider "kubernetes" {
-    host                   = aws_eks_cluster.test_cluster.endpoint
-    cluster_ca_certificate = base64decode(aws_eks_cluster.test_cluster.certificate_authority[0].data)
-}
-
-provider "kubectl" {
-    load_config_file = false
-    host                   = aws_eks_cluster.test_cluster.endpoint
-    cluster_ca_certificate = base64decode(aws_eks_cluster.test_cluster.certificate_authority[0].data)
+provider "aws" {
+  region = "us-east-1"
 }
 
 locals {
@@ -67,6 +61,7 @@ resource "aws_eks_node_group" "my_node_group" {
   depends_on = [ aws_eks_cluster.test_cluster ]
 }
 
+
 # EKS Add-ons
 resource "aws_eks_addon" "coredns" {
   cluster_name = local.cluster_name
@@ -94,96 +89,4 @@ resource "aws_eks_addon" "eks-pod-identity-agent" {
   addon_name = "eks-pod-identity-agent"
   addon_version = "v1.2.0-eksbuild.1"
   depends_on = [ aws_eks_cluster.test_cluster ]
-}
-
-
-# Prometheus and Grafana
-resource "kubernetes_namespace" "prometheus-namespace" {
-  depends_on = [aws_eks_node_group.my_node_group]
-
-  metadata {
-    name = "prometheus"
-  }
-}
-
-resource "helm_release" "prometheus" {
-  depends_on = [ kubernetes_namespace.prometheus-namespace ]
-  name       = "prometheus"
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  namespace  = kubernetes_namespace.prometheus-namespace.id
-  create_namespace = true
-  version    = "45.7.1"
-  values = [
-    file("values.yaml")
-  ]
-  timeout = 2000
-  
-
-set {
-    name  = "podSecurityPolicy.enabled"
-    value = true
-  }
-
-  set {
-    name  = "server.persistentVolume.enabled"
-    value = false
-  }
-
-  # You can provide a map of value using yamlencode. Don't forget to escape the last element after point in the name
-  set {
-    name = "server\\.resources"
-    value = yamlencode({
-      limits = {
-        cpu    = "200m"
-        memory = "50Mi"
-      }
-      requests = {
-        cpu    = "100m"
-        memory = "30Mi"
-      }
-    })
-  }
-}
-
-
-
-# ArgoCD
-# Create argocd namespace
-resource "kubernetes_namespace" "argo-namespace" {
-  depends_on = [aws_eks_node_group.my_node_group]
-
-  metadata {
-    name = "argocd"
-  }
-}
-
-# Update kubeconfig
-resource "null_resource" "update_kubeconfig" {
-  provisioner "local-exec" {
-    command = "aws eks update-kubeconfig --name my-eks-cluster"
-  }
-  depends_on = [kubernetes_namespace.argo-namespace]
-}
-
-# Install argocd
-resource "null_resource" "argocd-install" {
-  provisioner "local-exec" {
-    command = "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
-  }
-
-  depends_on = [
-    null_resource.update_kubeconfig
-  ]
-}
-
-# Expose argocd server
-resource "null_resource" "argocd-server" {
-  provisioner "local-exec" {
-    command = "kubectl port-forward svc/argocd-server -n argocd 8080:443"
-  }
-
-  depends_on = [
-    null_resource.argocd-install
-  ]
 }
