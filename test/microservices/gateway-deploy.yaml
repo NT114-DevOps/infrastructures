@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: gateway-c
-        image: tonyq2k3/gateway-service:dev
+        image: tonyq2k3/gateway-service:release
         env:
           - name: PORT
             value: "8000"

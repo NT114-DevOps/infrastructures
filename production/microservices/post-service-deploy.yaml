@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: post-microservice-c
-        image: tonyq2k3/post-microservice:release-d4d5580fc54dbce368452a5fd005f3d0cbfb9c53
+        image: tonyq2k3/post-microservice:release
         env:
           - name: PORT
             value: "8001"
