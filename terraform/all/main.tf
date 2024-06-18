@@ -65,28 +65,28 @@ output "kubeconfig-certificate-authority-data1" {
 
 
 # EKS Add-ons
-resource "aws_eks_addon" "coredns" {
+resource "aws_eks_addon" "coredns1" {
   cluster_name = local.cluster_name
   addon_name = "coredns"
   addon_version = "v1.11.1-eksbuild.4"
   depends_on = [ aws_eks_cluster.test_cluster, aws_eks_node_group.test_node_group ]
 }
 
-resource "aws_eks_addon" "kube-proxy" {
+resource "aws_eks_addon" "kube-proxy1" {
   cluster_name = local.cluster_name
   addon_name = "kube-proxy"
   addon_version = "v1.29.0-eksbuild.1"
   depends_on = [ aws_eks_cluster.test_cluster ]
 }
 
-resource "aws_eks_addon" "vpc-cni" {
+resource "aws_eks_addon" "vpc-cni1" {
   cluster_name = local.cluster_name
   addon_name = "vpc-cni"
   addon_version = "v1.16.0-eksbuild.1"
   depends_on = [ aws_eks_cluster.test_cluster ]
 }
 
-resource "aws_eks_addon" "eks-pod-identity-agent" {
+resource "aws_eks_addon" "eks-pod-identity-agent1" {
   cluster_name = local.cluster_name
   addon_name = "eks-pod-identity-agent"
   addon_version = "v1.2.0-eksbuild.1"
@@ -106,11 +106,11 @@ resource "aws_eks_cluster" "production_cluster" {
   version = "1.29" 
 }
 
-output "endpoint" {
+output "endpoint2" {
   value = aws_eks_cluster.production_cluster.endpoint
 }
 
-output "kubeconfig-certificate-authority-data" {
+output "kubeconfig-certificate-authority-data2" {
   value = aws_eks_cluster.production_cluster.certificate_authority[0].data
 }
 
@@ -135,28 +135,28 @@ resource "aws_eks_node_group" "prod_node_group" {
 }
 
 # EKS Add-ons
-resource "aws_eks_addon" "coredns" {
+resource "aws_eks_addon" "coredns2" {
   cluster_name = local.prod_cluster_name
   addon_name = "coredns"
   addon_version = "v1.11.1-eksbuild.4"
   depends_on = [ aws_eks_cluster.production_cluster, aws_eks_node_group.prod_node_group ]
 }
 
-resource "aws_eks_addon" "kube-proxy" {
+resource "aws_eks_addon" "kube-proxy2" {
   cluster_name = local.prod_cluster_name
   addon_name = "kube-proxy"
   addon_version = "v1.29.0-eksbuild.1"
   depends_on = [ aws_eks_cluster.production_cluster ]
 }
 
-resource "aws_eks_addon" "vpc-cni" {
+resource "aws_eks_addon" "vpc-cni2" {
   cluster_name = local.prod_cluster_name
   addon_name = "vpc-cni"
   addon_version = "v1.16.0-eksbuild.1"
   depends_on = [ aws_eks_cluster.production_cluster ]
 }
 
-resource "aws_eks_addon" "eks-pod-identity-agent" {
+resource "aws_eks_addon" "eks-pod-identity-agent2" {
   cluster_name = local.prod_cluster_name
   addon_name = "eks-pod-identity-agent"
   addon_version = "v1.2.0-eksbuild.1"
