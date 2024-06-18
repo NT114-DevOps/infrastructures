@@ -1,10 +1,44 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mongodb-pv
+  name: mongodb1-pv
 spec:
   capacity:
-    storage: 2Gi
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  volumeMode: Filesystem
+  hostPath:
+    path: /data/mongodb
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodb2-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  volumeMode: Filesystem
+  hostPath:
+    path: /data/mongodb
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mongodb3-pv
+spec:
+  capacity:
+    storage: 1Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
