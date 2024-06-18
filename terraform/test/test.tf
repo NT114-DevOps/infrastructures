@@ -1,4 +1,19 @@
 # Setup testing environment cluster
+
+provider "kubernetes" {
+    load_config_file = false
+    host                   = aws_eks_cluster.test_cluster.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.test_cluster.certificate_authority[0].data)
+    token                  = aws_eks_cluster.test_cluster.token
+}
+
+provider "kubectl" {
+    load_config_file = false
+    host                   = aws_eks_cluster.test_cluster.endpoint
+    cluster_ca_certificate = base64decode(aws_eks_cluster.test_cluster.certificate_authority[0].data)
+    token                  = aws_eks_cluster.test_cluster.token
+}
+
 locals {
   cluster_name = "test-environment"
   node_group_name = "test-nodes"
