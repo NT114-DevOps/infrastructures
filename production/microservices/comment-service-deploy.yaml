@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - name: comment-microservice-c
-        image: tonyq2k3/comment-microservice:latest
+        image: tonyq2k3/comment-microservice:release-99131dd734c1c5e6e6976a59243f329ad3f0cfb3
         env:
           - name: PORT
             value: "8002"
