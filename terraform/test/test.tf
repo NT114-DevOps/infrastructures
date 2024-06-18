@@ -42,7 +42,7 @@ output "kubeconfig-certificate-authority-data" {
 }
 
 # EKS Node Group
-resource "aws_eks_node_group" "my_node_group" {
+resource "aws_eks_node_group" "test_node_group" {
   cluster_name    = local.cluster_name
   node_group_name = local.node_group_name
   node_role_arn    = local.iam_role_arn

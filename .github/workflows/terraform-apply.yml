@@ -9,6 +9,7 @@ on:
         options:
           - test
           - production
+          - all
 
 env:
     TF_CLOUD_ORGANIZATION: "NT114"

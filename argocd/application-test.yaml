@@ -16,9 +16,11 @@ spec:
   destination:
   # Change this to K8S endpoint
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: app
 
   syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
     automated:
       prune: true
       selfHeal: true
