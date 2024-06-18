@@ -78,7 +78,7 @@ resource "aws_eks_addon" "eks-pod-identity-agent" {
 
 
 # Prometheus and Grafana
-resource "kubernetes_namespace" "kube-namespace" {
+resource "kubernetes_namespace" "prometheus-namespace" {
   depends_on = [aws_eks_node_group.my_node_group]
 
   metadata {
@@ -87,11 +87,11 @@ resource "kubernetes_namespace" "kube-namespace" {
 }
 
 resource "helm_release" "prometheus" {
-  depends_on = [ kubernetes_namespace.kube-namespace ]
+  depends_on = [ kubernetes_namespace.prometheus-namespace ]
   name       = "prometheus"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  namespace  = kubernetes_namespace.kube-namespace.id
+  namespace  = kubernetes_namespace.prometheus-namespace.id
   create_namespace = true
   version    = "45.7.1"
   values = [
@@ -124,4 +124,46 @@ set {
       }
     })
   }
+}
+
+
+
+# ArgoCD
+# Create argocd namespace
+resource "kubernetes_namespace" "argo-namespace" {
+  depends_on = [aws_eks_node_group.my_node_group]
+
+  metadata {
+    name = "argocd"
+  }
+}
+
+# Update kubeconfig
+resource "null_resource" "update_kubeconfig" {
+  provisioner "local-exec" {
+    command = "aws eks update-kubeconfig --name my-eks-cluster"
+  }
+  depends_on = [kubernetes_namespace.argo-namespace]
+}
+
+# Install argocd
+resource "null_resource" "argocd-install" {
+  provisioner "local-exec" {
+    command = "kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+  }
+
+  depends_on = [
+    null_resource.update_kubeconfig
+  ]
+}
+
+# Expose argocd server
+resource "null_resource" "argocd-server" {
+  provisioner "local-exec" {
+    command = "kubectl port-forward svc/argocd-server -n argocd 8080:443"
+  }
+
+  depends_on = [
+    null_resource.argocd-install
+  ]
 }
