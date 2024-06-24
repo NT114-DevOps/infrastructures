@@ -20,8 +20,8 @@ locals {
   prod_node_group_name = "production-nodes"
   stage_cluster_name = "staging-environment"
   stage_node_group_name = "staging-nodes"
-  vpc_id = "vpc-03312ce83615cf80a"
-  subnet_ids = ["subnet-0930513f1b4fe91fc", "subnet-02732b19faaaf68e2"]
+  vpc_id = "vpc-09c54b1cd895303e5"
+  subnet_ids = ["subnet-03d59a663dd8b72e7", "subnet-0733a7a924b1effa4", "subnet-0d8bb5c00748ace13"]
   iam_role_arn = "arn:aws:iam::624899937274:role/LabRole"
 }
 
