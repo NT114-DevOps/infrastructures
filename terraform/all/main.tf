@@ -198,11 +198,11 @@ resource "aws_eks_node_group" "staging_node_group" {
   depends_on = [ aws_eks_cluster.staging_cluster ]
 }
 
-output "endpoint1" {
+output "endpoint3" {
   value = aws_eks_cluster.staging_cluster.endpoint
 }
 
-output "kubeconfig-certificate-authority-data1" {
+output "kubeconfig-certificate-authority-data3" {
   value = aws_eks_cluster.staging_cluster.certificate_authority[0].data
 }
 
