@@ -9,6 +9,7 @@ on:
         options:
           - test
           - production
+          - staging
           - all
 
 env:
